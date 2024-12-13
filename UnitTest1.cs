@@ -40,7 +40,20 @@ public class Tests
             Path = "../../../Screenshots/ss01.jpg"
 
         });
-            
+        
+
+        //---- ui operation ------
+
+        // fill the login page
+        await page.FillAsync( "#UserName","admin");
+        await page.FillAsync("#Password", "password");
+        await page.ClickAsync("text=Log in");
+
+        var isExist = await page.Locator("text='Employee Details' ").IsVisibleAsync();
+
+
+        //assertion part
+        Assert.IsTrue(isExist);
        
     }
 }
