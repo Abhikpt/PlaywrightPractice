@@ -1,7 +1,7 @@
 namespace PlaywrightPractice;
 
 using Microsoft.Playwright;
-
+using NUnit.Compatibility;
 
 public class Tests
 {
@@ -18,7 +18,10 @@ public class Tests
         using var playwright = await Playwright.CreateAsync();
 
         //browser
-        await using var browser = await playwright.Chromium.LaunchAsync();
+        await using var browser = await playwright.Chromium.LaunchAsync( new BrowserTypeLaunchOptions
+        {
+            Headless = false
+        });
 
         // page
         var page = await browser.NewPageAsync();
@@ -29,8 +32,15 @@ public class Tests
         //clicked on LoginElement
         await page.ClickAsync(selector: "text=Login");
 
+        //take screenshot
+        await page.ScreenshotAsync(new PageScreenshotOptions
+        {
 
+            // store at bin/debug/net8.0
+            Path = "../../../Screenshots/ss01.jpg"
 
+        });
+            
        
     }
 }
