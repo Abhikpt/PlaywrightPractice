@@ -1735,11 +1735,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\ProjectWorkspace\\Playwright\\PlaywrightPractice\\PlaywrightPractice.csproj",
+      "projectUniqueName": "c:\\ProjectWorkspace\\Playwright\\PlaywrightPractice\\PlaywrightPractice.csproj",
       "projectName": "PlaywrightPractice",
-      "projectPath": "C:\\ProjectWorkspace\\Playwright\\PlaywrightPractice\\PlaywrightPractice.csproj",
+      "projectPath": "c:\\ProjectWorkspace\\Playwright\\PlaywrightPractice\\PlaywrightPractice.csproj",
       "packagesPath": "C:\\Users\\ASing\\.nuget\\packages\\",
-      "outputPath": "C:\\ProjectWorkspace\\Playwright\\PlaywrightPractice\\obj\\",
+      "outputPath": "c:\\ProjectWorkspace\\Playwright\\PlaywrightPractice\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\ASing\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -1748,6 +1748,7 @@
         "net8.0"
       ],
       "sources": {
+        "C:\\Program Files\\dotnet\\library-packs": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -1765,7 +1766,8 @@
         "enableAudit": "true",
         "auditLevel": "low",
         "auditMode": "direct"
-      }
+      },
+      "SdkAnalysisLevel": "9.0.200"
     },
     "frameworks": {
       "net8.0": {
@@ -1807,12 +1809,26 @@
         ],
         "assetTargetFallback": true,
         "warn": true,
+        "downloadDependencies": [
+          {
+            "name": "Microsoft.AspNetCore.App.Ref",
+            "version": "[8.0.15, 8.0.15]"
+          },
+          {
+            "name": "Microsoft.NETCore.App.Ref",
+            "version": "[8.0.15, 8.0.15]"
+          },
+          {
+            "name": "Microsoft.WindowsDesktop.App.Ref",
+            "version": "[8.0.15, 8.0.15]"
+          }
+        ],
         "frameworkReferences": {
           "Microsoft.NETCore.App": {
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.206/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.203/PortableRuntimeIdentifierGraph.json"
       }
     }
   }
