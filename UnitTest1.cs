@@ -10,8 +10,8 @@ public class Tests
     {
     }
 
-    [Test]
-    public async  Task  Test1()
+    [Test, Category("Eaap login test")]
+    public async  Task  EaapLoginTest()
     {
     
         //Playwright

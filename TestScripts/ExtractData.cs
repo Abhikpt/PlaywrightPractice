@@ -1,13 +1,15 @@
 namespace PlaywrightPractice;
 
 using System.Security.Cryptography.X509Certificates;
-using System.Text.Json;
 using Microsoft.Playwright;
 using PlaywrightPractice.Utilities;
 
-public class EspnCrickinfo
+public class ExtractData
 {
     public static string DateString = DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss");
+    public static string ProjectDirectory = Directory.GetParent(Environment.CurrentDirectory).Parent.Parent.FullName;
+ //   public static string ScreenshotPath = "../../../Resources/TestSS" + DateString + ".jpg";
+    public static string jsonFilePath = "../../../Resources/CricketCard" + DateString + ".json" ;
 
     [SetUp]
     public void Setup()
@@ -21,12 +23,10 @@ public class EspnCrickinfo
         List<CricketMatchCard> matchCardsdetails = new List<CricketMatchCard>();
         List<CricketMatchCard> matchCardsFromJson = new List<CricketMatchCard>();
 
-        
-    
         //Playwright
         using var playwright = await Playwright.CreateAsync();
 
-        //browser
+        //create browser object by setting browser in non-headless mode
         await using var browser = await playwright.Chromium.LaunchAsync( new  BrowserTypeLaunchOptions
         {
             Headless = false
@@ -40,6 +40,12 @@ public class EspnCrickinfo
         await page.GotoAsync( "https://www.espncricinfo.com/");       
         Console.WriteLine($"PageTitle: { await page.TitleAsync()}"); 
 
+        //take screenshot
+        await page.ScreenshotAsync(new PageScreenshotOptions
+        {
+            // store at bin/debug/net8.0
+            Path = ProjectDirectory + "/Resources/TestSS" + DateString + ".jpg"
+        });
 
 
         //--------------------------extracting Data --------------------------------------       
@@ -124,68 +130,25 @@ public class EspnCrickinfo
             }
         }
         
-        // Save matchCardsdetails to a JSON file
-        var jsonFilePath = "../../../MatchCardsDetails_" + DateString + ".json";
-        try
-        {
-            var jsonData = JsonSerializer.Serialize(matchCardsdetails, new JsonSerializerOptions
-            {
-                WriteIndented = true
-            });
-            await File.WriteAllTextAsync(jsonFilePath, jsonData);
-            Console.WriteLine($"✅ Match card details saved to JSON file: {jsonFilePath}");
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"❌ Failed to save match card details to JSON file: {ex.Message}");
-        }
 
-        // Read matchCardsdetails from the JSON file and display the data
-        // try
-        // {
-        //     if (File.Exists(jsonFilePath))
-        //     {
-        //         var jsonData = await File.ReadAllTextAsync(jsonFilePath);
-        //         var matchCardsFromJson = JsonSerializer.Deserialize<List<CricketMatchCard>>(jsonData);
-
-        //         if (matchCardsFromJson != null && matchCardsFromJson.Any())
-        //         {
-        //             Console.WriteLine("\n📂 Data extracted from JSON file:\n");
-        //             DisplayMatchCards(matchCardsFromJson);
-        //         }
-        //         else
-        //         {
-        //             Console.WriteLine("❌ No data found in the JSON file.");
-        //         }
-        //     }
-        //     else
-        //     {
-        //         Console.WriteLine("❌ JSON file not found.");
-        //     }
-        // }
-        // catch (Exception ex)
-        // {
-        //     Console.WriteLine($"❌ Failed to read or parse JSON file: {ex.Message}");
-        // }
-
-         matchCardsFromJson = await TestUtil.ReadObjectFromJsonFileAsync<List<CricketMatchCard>>(jsonFilePath);
-        DisplayMatchCards(matchCardsFromJson?? default(List<CricketMatchCard>));
-        // Console.WriteLine("✅ Extraction complete.");
+        // Save the extracted data to a JSON file
+        string jsonFilePath = "../../../Resources/Test" + DateString + ".json" ;
+        await TestUtil.SaveObjectToJsonFileAsync(matchCardsdetails, jsonFilePath);
         
-
-
-        
+        // Display the extracted data from JSON file
+         matchCardsFromJson = TestUtil.ReadObjectFromJsonFileAsync<List<CricketMatchCard>>(jsonFilePath).GetAwaiter().GetResult();
+        DisplayMatchCards(matchCardsFromJson);
 
     }
-    
 
     
-    internal void DisplayMatchCards(List<CricketMatchCard> matchCards)
+    public void DisplayMatchCards(List<CricketMatchCard> matchCards)
     {
         Console.WriteLine("🏏 Recent Matches on ESPN Cricinfo:\n");
         int i =0;
         foreach (var card in matchCards)
-        {            
+        {
+            
             i++;
             Console.WriteLine("-----------------------------");
             Console.WriteLine($"Match {i}: {card.MatchTitle}");
@@ -198,9 +161,10 @@ public class EspnCrickinfo
 
      
     
+}
 
 
-internal class CricketMatchCard
+public class CricketMatchCard
 {
     public string MatchTitle { get; set; }           // e.g., "33rd Match • IPL • T20 • Wankhede"
     
@@ -218,4 +182,5 @@ internal class CricketMatchCard
     
 }
 
-}
+
+//dump this conten in json ,
