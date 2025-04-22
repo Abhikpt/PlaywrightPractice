@@ -20,9 +20,7 @@ public class EspnCrickinfo
 
         List<CricketMatchCard> matchCardsdetails = new List<CricketMatchCard>();
         List<CricketMatchCard> matchCardsFromJson = new List<CricketMatchCard>();
-
-        
-    
+   
         //Playwright
         using var playwright = await Playwright.CreateAsync();
 
@@ -32,12 +30,16 @@ public class EspnCrickinfo
             Headless = false
         });
        
-
         // create new page in browser context
         var page = await browser.NewPageAsync();
         
         //go to URl
-        await page.GotoAsync( "https://www.espncricinfo.com/");       
+
+        await page.GotoAsync("https://www.espncricinfo.com/", new PageGotoOptions
+        {
+            Timeout = 60000 // Set timeout to 60 seconds
+        });
+
         Console.WriteLine($"PageTitle: { await page.TitleAsync()}"); 
 
 
@@ -46,19 +48,25 @@ public class EspnCrickinfo
         await page.WaitForTimeoutAsync(3000); // Let dynamic content load
 
         var matchCardList = await page.Locator("//*[@id='main-container']/div[2]/div/div[3]/div/div/div/div/div[contains(@class,'slick-slide')]").AllAsync();
+        
         Console.WriteLine($"Total Match Cards: {matchCardList.Count}");
 
         Console.WriteLine("🏏 Recent Matches on ESPN Cricinfo:\n");
 
         foreach (var card in matchCardList)
         {
+
+          
             try
             {
             var matchTitle = string.Empty;
             try
             {
-                matchTitle = await card.Locator("div.ds-truncate span.ds-text-tight-xs.ds-text-typo-mid2").InnerTextAsync();
+
+             matchTitle = await card.Locator("div.ds-truncate span.ds-text-tight-xs.ds-text-typo-mid2").InnerTextAsync();
+           
             }
+
             catch (Exception)
             {
                 Console.WriteLine("Match title not found, skipping...");

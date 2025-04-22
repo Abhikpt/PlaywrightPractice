@@ -8,7 +8,7 @@ public class ExtractData
 {
     public static string DateString = DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss");
     public static string ProjectDirectory = Directory.GetParent(Environment.CurrentDirectory).Parent.Parent.FullName;
- //   public static string ScreenshotPath = "../../../Resources/TestSS" + DateString + ".jpg";
+    //   public static string ScreenshotPath = "../../../Resources/TestSS" + DateString + ".jpg";
     public static string jsonFilePath = "../../../Resources/CricketCard" + DateString + ".json" ;
 
     [SetUp]
@@ -21,6 +21,9 @@ public class ExtractData
     {
 
         List<CricketMatchCard> matchCardsdetails = new List<CricketMatchCard>();
+        List<CricketMatchCard> MatchCompleted = new List<CricketMatchCard>();
+        List<CricketMatchCard> MatchUpcoming = new List<CricketMatchCard>();
+        List<CricketMatchCard> MatchLive = new List<CricketMatchCard>();
         List<CricketMatchCard> matchCardsFromJson = new List<CricketMatchCard>();
 
         //Playwright
@@ -37,13 +40,16 @@ public class ExtractData
         var page = await browser.NewPageAsync();
         
         //go to URl
-        await page.GotoAsync( "https://www.espncricinfo.com/");       
+        await page.GotoAsync( "https://www.espncricinfo.com/", new PageGotoOptions
+        {
+            Timeout = 60000 // Set timeout to 60 seconds
+        });
+
         Console.WriteLine($"PageTitle: { await page.TitleAsync()}"); 
 
         //take screenshot
         await page.ScreenshotAsync(new PageScreenshotOptions
-        {
-            // store at bin/debug/net8.0
+        {   // store at bin/debug/net8.0
             Path = ProjectDirectory + "/Resources/TestSS" + DateString + ".jpg"
         });
 
@@ -51,111 +57,88 @@ public class ExtractData
         //--------------------------extracting Data --------------------------------------       
         await page.WaitForTimeoutAsync(3000); // Let dynamic content load
 
-        var matchCardList = await page.Locator("//*[@id='main-container']/div[2]/div/div[3]/div/div/div/div/div[contains(@class,'slick-slide')]").AllAsync();
+        var matchCardList = await page.Locator(@"div.slick-list>div.slick-track > div.slick-slide div.ds-w-\[288px\]").AllAsync();
+        
         Console.WriteLine($"Total Match Cards: {matchCardList.Count}");
-
-        Console.WriteLine("🏏 Recent Matches on ESPN Cricinfo:\n");
 
         foreach (var card in matchCardList)
         {
-            try
+            
+              // if matche is completed/live
+            var elements = await card.Locator("div.ds-truncate span.ds-text-tight-xs.ds-leading-5").AllAsync();
+            if (elements.Count > 0 && await elements[0].IsVisibleAsync())
             {
-            var matchTitle = string.Empty;
-            try
-            {
-                matchTitle = await card.Locator("div.ds-truncate span.ds-text-tight-xs.ds-text-typo-mid2").InnerTextAsync();
-            }
-            catch (Exception)
-            {
-                Console.WriteLine("Match title not found, skipping...");
+                var matchTitle = await card.Locator("div.ds-truncate span.ds-text-tight-xs.ds-text-typo-mid2").InnerTextAsync();
+                var team1 = await card.Locator("div.ci-team-score:nth-child(1) p").InnerTextAsync();
+                var team2 = await card.Locator("div.ci-team-score:nth-child(2) p").InnerTextAsync();
+                var MatchStatus = await card.Locator("div.ds-h-3 p span").InnerTextAsync();
+                var score1 = await card.Locator("div.ci-team-score:nth-child(1) > div:nth-child(2)").InnerTextAsync();    
+                var score2 = await card.Locator("div.ci-team-score:nth-child(2) > div:nth-child(2)").InnerTextAsync();
+                MatchCompleted.Add(new CricketMatchCard
+                {
+                    MatchTitle = matchTitle,
+                    Team1 = team1,
+                    Team2 = team2,
+                    MatchStatus = MatchStatus,
+                    Score1 = score1,
+                    Score2 = score2,    
+                });
+
             }
 
-            var team1 = string.Empty;
-            try
-            {
-                team1 = await card.Locator("div.ci-team-score:nth-child(1) p").InnerTextAsync();
-            }
-            catch (Exception)
-            {
-                Console.WriteLine("Team 1 not found, skipping...");
-            }
+            else
 
-            var team2 = string.Empty;
-            try
             {
-                team2 = await card.Locator("div.ci-team-score:nth-child(2) p").InnerTextAsync();
+                var matchTitle = await card.Locator("css=div.ds-truncate span.ds-text-tight-xs.ds-text-typo-mid2").InnerTextAsync();
+                var team1 = await card.Locator("css=div.ci-team-score:nth-child(1) p").InnerTextAsync();
+                var team2 = await card.Locator("css=div.ci-team-score:nth-child(2) p").InnerTextAsync();
+                var MatchStatus = await card.Locator("css=div.ds-h-3 p span").InnerTextAsync();
+                var MatchTime = await card.Locator("css=div.ds-text-tight-m.ds-font-bold").InnerTextAsync() ?? "N/A";
+                MatchUpcoming.Add(new CricketMatchCard
+                {
+                    MatchTitle = matchTitle,
+                    Team1 = team1,
+                    Team2 = team2,
+                    MatchStatus = MatchStatus,
+                    MatchTime = MatchTime,
+                });
             }
-            catch (Exception)
-            {
-                Console.WriteLine("Team 2 not found, skipping...");
-            }
-
-            var MatchStatus = string.Empty;
-            try
-            {
-                MatchStatus = await card.Locator("div.ds-h-3 p span").InnerTextAsync();
-            }
-            catch (Exception)
-            {
-                Console.WriteLine("Match status not found, skipping...");
-            }
-
-            var MatchTime = string.Empty;
-            try
-            {
-                MatchTime = await card.Locator("div.ds-text-tight-m.ds-font-bold").InnerTextAsync() ?? "N/A";
-            }
-            catch (Exception)
-            {
-                Console.WriteLine("Match time not found, skipping...");
-            }
-         
-          
-            matchCardsdetails.Add(new CricketMatchCard
-            {
-                MatchTitle = matchTitle,
-                Team1 = team1,
-                Team2 = team2,
-                MatchStatus = MatchStatus,
-                MatchTime = MatchTime,
-                
-            });
-        
            
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error extracting match data: {ex.Message}");
-                continue; // Skip to the next card if there's an error
-            }
-        }
+        }      
         
-
         // Save the extracted data to a JSON file
         string jsonFilePath = "../../../Resources/Test" + DateString + ".json" ;
-        await TestUtil.SaveObjectToJsonFileAsync(matchCardsdetails, jsonFilePath);
+
+        // Combine MatchCompleted and MatchUpcoming into a single list
+        var allMatches = MatchCompleted.Concat(MatchUpcoming).ToList();
+
+        // Save the combined data to a JSON file
+        await TestUtil.SaveObjectToJsonFileAsync(allMatches, jsonFilePath);
         
         // Display the extracted data from JSON file
-         matchCardsFromJson = TestUtil.ReadObjectFromJsonFileAsync<List<CricketMatchCard>>(jsonFilePath).GetAwaiter().GetResult();
+        matchCardsFromJson = TestUtil.ReadObjectFromJsonFileAsync<List<CricketMatchCard>>(jsonFilePath).GetAwaiter().GetResult();
         DisplayMatchCards(matchCardsFromJson);
 
     }
-
     
     public void DisplayMatchCards(List<CricketMatchCard> matchCards)
     {
         Console.WriteLine("🏏 Recent Matches on ESPN Cricinfo:\n");
+
         int i =0;
         foreach (var card in matchCards)
-        {
-            
-            i++;
+        {                  
+           i++;
             Console.WriteLine("-----------------------------");
             Console.WriteLine($"Match {i}: {card.MatchTitle}");
-            Console.WriteLine($"Teams: {card.Team1} vs {card.Team2}");
-            Console.WriteLine($"Match Status: {card.MatchStatus}");           
+            Console.WriteLine($"Teams: {card.Team1} vs {card.Team2}");            
+            Console.WriteLine($"Match Status: {card.MatchStatus}"); 
+            if(card.MatchTime == null) 
+            Console.WriteLine($"Score of team 1, 2: {card.Score1} vs {card.Score2}");
+            else
             Console.WriteLine($"Match Time: {card.MatchTime}");
-             Console.WriteLine("-----------------------------");
+            Console.WriteLine("-----------------------------");
+           
         }
     }  
 
