@@ -29,8 +29,8 @@ jobs:
         run: dotnet build --configuration Release --no-restore
 
       # adding this steps to debug the correct path
-   #   - name: List Playwright script path
-   #     run: ls -R bin/
+ #     - name: List Playwright script path
+  #      run: ls -R bin/
 
       - name: Install Playwright Browsers
         run: pwsh bin/Release/net8.0/playwright.ps1 install  # adjust net version
@@ -53,7 +53,7 @@ jobs:
             bin/Debug/net8.0/playwright-report/
 
   download_artifacts:
-    needs: build  # Ensure this job runs after the 'build' job
+    needs: Playwright-test  # Ensure this job runs after the 'Playwright-test' job
     runs-on: ubuntu-latest
 
     steps:
