@@ -38,6 +38,5 @@ jobs:
           name: test-logs
           path: |
             TestResults/
-            Logs/                 # If you store your logs here
             Screenshots/          # If screenshots are saved here
-            bin/Debug/net8.0/playwright-report/   # Adjust for your test report location
+        #    bin/Debug/net8.0/playwright-report/   # Adjust for your test report location
