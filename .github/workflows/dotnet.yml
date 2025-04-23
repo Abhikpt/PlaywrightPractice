@@ -2,9 +2,9 @@ name: Playwright NUnit Tests
 
 on:
   push:
-    branches: [ main ]
+    branches: [ project_ql ]
   pull_request:
-    branches: [ main ]
+    branches: [ project_ql ]
 
 jobs:
   e2e-tests:
