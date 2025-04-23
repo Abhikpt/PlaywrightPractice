@@ -28,9 +28,11 @@ jobs:
       - name: Build project
         run: dotnet build --configuration Release --no-restore
 
-      # Run tests
-      - name: Run tests
-        run: dotnet test --configuration Release --logger "trx;LogFileName=test-results.trx"
+      - name: Install Playwright Browsers
+        run: pwsh bin/Debug/net8.0/playwright.ps1 install  # adjust net version
+
+      - name: Run Playwright NUnit Tests
+        run: dotnet test --no-build --configuration Release --logger "trx;LogFileName=test-results.trx"
 
       # Upload artifacts
       - name: Upload test-logs
