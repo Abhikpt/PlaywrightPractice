@@ -1,48 +1,43 @@
-# This workflow will build a .NET project
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
-name: Dotnet package
+name: Playwright NUnit Tests
 
 on:
-   push:
-     branches: [ "project_ql" ]
-   pull_request:
-     branches: [ "project_ql" ]
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
-   build:
-   
+  e2e-tests:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-    - uses: actions/checkout@v4
-    
-    - name: Setup .NET          # Change To Setup Node.js if using js
-      uses: actions/setup-dotnet@v4      
-      with:
-        dotnet-version: 8.0.x     # Change if you're using .NET 7 or 6
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-        
-    - name: Restore dependencies
-      run: dotnet restore 
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'  # Change if you're using .NET 7 or 6
 
-      
-    - name: Build solution
-      run: dotnet build --no-restore --configuration Release
+      - name: Restore dependencies
+        run: dotnet restore
 
-    - name: Install Playwright Browsers
-      run: pwsh bin/Debug/net8.0/playwright.ps1 install  # adjust net version
+      - name: Build solution
+        run: dotnet build --no-restore --configuration Release
 
-    - name: Run Playwright NUnit Tests
-      run: dotnet test --no-build --configuration Release --logger "trx;LogFileName=test-results.trx"
-    
-    - name: Upload NUnit Logs
-      if: always()
-      uses: actions/upload-artifact@v3
-      with:
-        name: test-logs
-        path: |
-          TestResults/
-          Logs/                 # If you store your logs here
-          Screenshots/          # If screenshots are saved here
-          bin/Debug/net8.0/playwright-report/   # Adjust for your test report location
+      - name: Install Playwright Browsers
+        run: pwsh bin/Debug/net8.0/playwright.ps1 install  # adjust net version
+
+      - name: Run Playwright NUnit Tests
+        run: dotnet test --no-build --configuration Release --logger "trx;LogFileName=test-results.trx"
+
+      - name: Upload NUnit Logs
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-logs
+          path: |
+            TestResults/
+            Logs/                 # If you store your logs here
+            Screenshots/          # If screenshots are saved here
+            bin/Debug/net8.0/playwright-report/   # Adjust for your test report location
