@@ -28,8 +28,12 @@ jobs:
       - name: Build project
         run: dotnet build --configuration Release --no-restore
 
+      # adding this steps to debug the correct path
+      - name: List Playwright script path
+        run: ls -R bin/
+
       - name: Install Playwright Browsers
-        run: pwsh bin/Debug/net8.0/playwright.ps1 install  # adjust net version
+        run: pwsh bin/Release/net8.0/playwright.ps1 install  # adjust net version
 
       - name: Run Playwright NUnit Tests
         run: dotnet test --no-build --configuration Release --logger "trx;LogFileName=test-results.trx"
@@ -42,7 +46,7 @@ jobs:
           name: test-logs
           path: |
             TestResults/
-         
+            Logs/ 
             Screenshots/
             bin/Debug/net8.0/playwright-report/
 
