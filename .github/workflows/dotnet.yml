@@ -1,42 +1,57 @@
-name: Playwright NUnit Tests
+name: Playwright Test Workflow
 
 on:
   push:
-    branches: [ project_ql ]
-  pull_request:
-    branches: [ project_ql ]
+    branches:
+      - main
 
 jobs:
-  e2e-tests:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      # Check out the code
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+      # Set up .NET SDK
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '8.0.x'  # Change if you're using .NET 7 or 6
+          dotnet-version: '8.0'
 
+      # Restore dependencies
       - name: Restore dependencies
         run: dotnet restore
 
-      - name: Build solution
-        run: dotnet build --no-restore --configuration Release
+      # Build project
+      - name: Build project
+        run: dotnet build --configuration Release --no-restore
 
-      - name: Install Playwright Browsers
-        run: pwsh bin/Debug/net8.0/playwright.ps1 install  # adjust net version
+      # Run tests
+      - name: Run tests
+        run: dotnet test --configuration Release --logger "trx;LogFileName=test-results.trx"
 
-      - name: Run Playwright NUnit Tests
-        run: dotnet test --no-build --configuration Release --logger "trx;LogFileName=test-results.trx"
-
-      - name: Upload NUnit Logs
+      # Upload artifacts
+      - name: Upload test-logs
         if: always()
         uses: actions/upload-artifact@v3
         with:
           name: test-logs
           path: |
             TestResults/
-            Screenshots/          # If screenshots are saved here
-        #    bin/Debug/net8.0/playwright-report/   # Adjust for your test report location
+            Logs/
+            Screenshots/
+            bin/Debug/net8.0/playwright-report/
+
+  download_artifacts:
+    needs: build  # Ensure this job runs after the 'build' job
+    runs-on: ubuntu-latest
+
+    steps:
+      # Download uploaded artifacts
+      - name: Download test-logs artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: test-logs
+          path: ./downloaded-artifacts
