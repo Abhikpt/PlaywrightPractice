@@ -6,31 +6,31 @@ on:
       - project_ql
 
 jobs:
-  build:
+  Playwright-test:             #you can give any name
     runs-on: ubuntu-latest
 
     steps:
-      # Check out the code
+      # Pulls/checkout the code from your GitHub repository into the runner machine.
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Set up .NET SDK
+      # Set up .NET SDK  / javascript as needed
       - name: Set up .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.0'
+          dotnet-version: '8.0'   #check the version used by you
 
-      # Restore dependencies
+      # Restores all dependencies defined in your .csproj files using NuGet.
       - name: Restore dependencies
         run: dotnet restore
 
-      # Build project
+      # Compiles the code in Release mode. no restore needed again
       - name: Build project
         run: dotnet build --configuration Release --no-restore
 
       # adding this steps to debug the correct path
-      - name: List Playwright script path
-        run: ls -R bin/
+   #   - name: List Playwright script path
+   #     run: ls -R bin/
 
       - name: Install Playwright Browsers
         run: pwsh bin/Release/net8.0/playwright.ps1 install  # adjust net version
