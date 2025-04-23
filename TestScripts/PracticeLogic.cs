@@ -13,7 +13,6 @@ public class PracticeLogic
         Method01();
         Method02();
         Console.WriteLine("Logic Execution Completed");
-
     }
 
     public void Method01()
