@@ -3,7 +3,7 @@ name: Playwright Test Workflow
 on:
   push:
     branches:
-      - main
+      - project_ql
 
 jobs:
   build:
