@@ -1,9 +1,9 @@
-namespace PlaywrightPractice;
-
 using System.Security.Cryptography.X509Certificates;
 using Microsoft.Playwright;
 using PlaywrightPractice.Utilities;
 
+
+namespace PlaywrightPractice.TestScripts;
 public class ExtractData
 {
     public static string DateString = DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss");

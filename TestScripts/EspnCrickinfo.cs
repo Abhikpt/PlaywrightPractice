@@ -1,9 +1,8 @@
-namespace PlaywrightPractice;
-
-using System.Security.Cryptography.X509Certificates;
 using System.Text.Json;
 using Microsoft.Playwright;
 using PlaywrightPractice.Utilities;
+
+namespace PlaywrightPractice.TestScripts;
 
 public class EspnCrickinfo
 {

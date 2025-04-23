@@ -1,7 +1,8 @@
-namespace PlaywrightPractice;
 
 using Microsoft.Playwright;
 using NUnit.Compatibility;
+
+namespace PlaywrightPractice.TestScripts;
 
 public class Tests
 {
