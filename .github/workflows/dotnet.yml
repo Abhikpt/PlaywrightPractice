@@ -49,6 +49,7 @@ jobs:
             TestResults/
             Logs/ 
             Screenshots/
+            Resources/
             bin/Debug/net8.0/playwright-report/
 
   download_artifacts:
