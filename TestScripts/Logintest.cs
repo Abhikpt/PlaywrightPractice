@@ -30,8 +30,8 @@ public class logintest
 
          Console.WriteLine($"PageTitle: { await page.TitleAsync()}"); 
 
-        await page.FillAsync("#username", "username");
-        await page.FillAsync("#password", "password"); 
+        await page.FillAsync("#username", username);
+        await page.FillAsync("#password", password); 
         await page.ClickAsync("#submit");
         string message = await page.Locator("#loop-container > div > article > div.post-header > h1").InnerTextAsync();
         Console.WriteLine($"Login Message: {message}");
