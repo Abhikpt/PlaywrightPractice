@@ -42,6 +42,13 @@ jobs:
         env:
           USERNAME: ${{ secrets.USERNAME }}
           PASSWORD: ${{ secrets.PASSWORD }}
+      - name: Debug environment variables (for development only)
+        run: |
+          echo "Secrets are set."
+          echo "USERNAME is: ${USERNAME:0:3}***"
+          echo "PASSWORD is: ${PASSWORD:0:3}***"
+        env:
+          USERNAME: ${{ secrets.USERNAME }}
 
           
       # Upload artifacts
