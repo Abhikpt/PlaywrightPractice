@@ -1,4 +1,4 @@
-name: Playwright Test Workflow
+name: Playwright manual Workflow
 
 on:
   workflow_dispatch:
