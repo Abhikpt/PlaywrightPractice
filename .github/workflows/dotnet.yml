@@ -38,7 +38,11 @@ jobs:
        # 👉 Add this step to run tests with xvfb (for headed mode)
       - name: Run Playwright Tests
         run: xvfb-run -a dotnet test --configuration Release --no-build --logger "trx;LogFileName=test-results.trx"
-
+        # Take the value from Git secret and pass to TestMethod
+        env:
+          USERNAME: ${{ secrets.USERNAME }}
+          PASSWORD: ${{ secrets.PASSWORD }}
+          
       # Upload artifacts
       - name: Upload test-logs
         if: always()
