@@ -12,7 +12,9 @@ public class logintest
 
     [Test]
     public async Task TC_01_LoginTest()
-    {   
+    {   var username = Environment.GetEnvironmentVariable("USERNAME");
+        var password = Environment.GetEnvironmentVariable("PASSWORD");
+        Console.WriteLine($"Username: {username} and Password: {password}");
         Console.WriteLine("Login Test Started");
 
          var playwright = await Playwright.CreateAsync();
@@ -28,9 +30,8 @@ public class logintest
 
          Console.WriteLine($"PageTitle: { await page.TitleAsync()}"); 
 
-
-        await page.FillAsync("#username", "student");
-        await page.FillAsync("#password", "Password123"); 
+        await page.FillAsync("#username", "username");
+        await page.FillAsync("#password", "password"); 
         await page.ClickAsync("#submit");
         string message = await page.Locator("#loop-container > div > article > div.post-header > h1").InnerTextAsync();
         Console.WriteLine($"Login Message: {message}");
