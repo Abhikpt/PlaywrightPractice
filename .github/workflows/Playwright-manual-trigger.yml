@@ -1,0 +1,70 @@
+name: Playwright manual Workflow
+
+on:
+  workflow_dispatch:
+
+jobs:
+  Playwright-test:             #you can give any name
+    runs-on: ubuntu-latest    
+    env:
+      USERNAME: ${{ secrets.USERNAME }}  # Securely fetch username from GitHub Secrets
+      PASSWORD: ${{ secrets.PASSWORD }}  # Securely fetch password from GitHub Secrets
+
+    steps:
+      # Pulls/checkout the code from your GitHub repository into the runner machine.
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Set up .NET SDK  / javascript as needed
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0'   #check the version used by you
+
+      # Restores all dependencies defined in your .csproj files using NuGet.
+      - name: Restore dependencies
+        run: dotnet restore
+
+      # Compiles the code in Release mode. no restore needed again
+      - name: Build project
+        run: dotnet build --configuration Release --no-restore
+
+      # adding this steps to debug the correct path
+ #     - name: List Playwright script path
+  #      run: ls -R bin/
+
+      - name: Install Playwright Browsers
+        run: pwsh bin/Release/net8.0/playwright.ps1 install  # adjust net version
+        
+       # 👉 Add this step to run tests with xvfb (for headed mode)
+      - name: Run Playwright Tests
+        run: xvfb-run -a dotnet test --configuration Release --no-build --logger "trx;LogFileName=test-results.trx"
+        env:
+          USERNAME: ${{ secrets.USERNAME }}
+          PASSWORD: ${{ secrets.PASSWORD }}
+
+          
+      # Upload artifacts
+      - name: Upload test-logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-logs
+          path: |
+            TestResults/
+            Logs/ 
+            Screenshots/
+            Resources/
+            bin/Debug/net8.0/playwright-report/
+
+  download_artifacts:
+    needs: Playwright-test  # Ensure this job runs after the 'Playwright-test' job
+    runs-on: ubuntu-latest
+
+    steps:
+      # Download uploaded artifacts
+      - name: Download test-logs artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: test-logs
+          path: ./downloaded-artifacts
