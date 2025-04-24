@@ -6,9 +6,9 @@ on:
 jobs:
   Playwright-test:             #you can give any name
     runs-on: ubuntu-latest    
-    env:
-      USERNAME: ${{ secrets.USERNAME }}  # Securely fetch username from GitHub Secrets
-      PASSWORD: ${{ secrets.PASSWORD }}  # Securely fetch password from GitHub Secrets
+#    env:
+#      USERNAME: ${{ secrets.USERNAME }}  # Securely fetch username from GitHub Secrets
+#      PASSWORD: ${{ secrets.PASSWORD }}  # Securely fetch password from GitHub Secrets
 
     steps:
       # Pulls/checkout the code from your GitHub repository into the runner machine.
@@ -42,6 +42,13 @@ jobs:
         env:
           USERNAME: ${{ secrets.USERNAME }}
           PASSWORD: ${{ secrets.PASSWORD }}
+      - name: Debug environment variables (for development only)
+        run: |
+          echo "Secrets are set."
+          echo "USERNAME is: ${USERNAME:0:3}***"
+          echo "PASSWORD is: ${PASSWORD:0:3}***"
+        env:
+          USERNAME: ${{ secrets.USERNAME }}
 
           
       # Upload artifacts
